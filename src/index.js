@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const app = express();
 
 app.use(bodyParser.json());
+
 const subscribers = new Map();
 const eventsStore = [];
 
@@ -14,6 +15,7 @@ class EventData {
         this.eventType = eventType;
         this.eventData = eventData;
     }
+    
     toString() {
         return `Event ${this.eventType} occured at ${time}`;
     }
@@ -60,17 +62,25 @@ app.post('/events', (req, res) => {
 
 });
 
-app.get('/events', (req, res) => {
+const displayEventsDataList = (store) => {
     let message = '<ul>';
-    for (let msg of eventsStore) {
+    for (let msg of store) {
         message += `<li>${msg}</li>`;
     }
     message += '</ul>';
-    res.send(`<div>Event message list </div><br/><div>${message}</div>`);
-
+    return `<div>Event message list </div><br/><div>${message}</div>`
+};
+app.get('/events', (req, res) => {
+    res.send(displayEventsDataList(eventsStore));
 });
 
+app.get('/get-past-events/:timeline', (req, res) => {
 
+    const pastEvents = eventsStore.filter(evt => {
+        return evt.timeline <= req.params.timeline;
+    });
+    res.send(displayEventsDataList(pastEvents));
+});
 app.get('/get-format', (req, res) => {
     const postEvents = `{
         "type": "EVENT_CREATED", 
@@ -95,7 +105,6 @@ app.get('/get-format', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-
 
     const responseString = `<div><h2>Find the list of the subscribed events at <a href="/list-events">here</a></h2></div>
     <div><h2>Find the list of the events <a href="/events">here</a></h2></div>
