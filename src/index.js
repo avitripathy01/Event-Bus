@@ -125,9 +125,19 @@ const informSubscriber = async (subscriber, type, data) => {
 
 };
 const stampEvent = (type, data) => {
-    eventsStore.push(new EventData(type, data));
+    let  eventData = new EventData(type, data);
+    eventsStore.push(eventData);
+    backupEvent(eventData);
+}
 
+backupEvent = (event) ={
+    //backup to a datastore; TODO
+}
+
+primeStore = () =>{
+    // fill in Event Data in the eventstore;   TODO
 }
 app.listen(3000, () => {
+    primeStore();
     console.log('Node express listening on 3000 !');
 });
